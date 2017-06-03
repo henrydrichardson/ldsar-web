@@ -8,7 +8,7 @@ function astroObject(stage, name, color, anchor, distance, size, turnsPerYear) {
 	this.anchor = anchor;
 	this.astro.graphics.beginFill(color).drawCircle(0,0,size);
 	if(anchor==null){
-		this.astro.x=stage.canvas.width/2;
+		this.astro.x= (stage.canvas.width)/2;
 		this.astro.y=stage.canvas.height/2;
 	} else {
 		//Find Anchor Position
@@ -39,20 +39,44 @@ astroObject.prototype.updatePosition = function() {
 	this.astro.y = this.anchor.getCanvasDrawing().y + y;
 }
 
+function resizeCanvas(canvas) {
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+}
+
 function init() {
+	var canvas = document.getElementById('mainGame'),
+		context = canvas.getContext('2d');
+
+	window.addEventListener('resize',resizeCanvas(canvas),false);
 	var stage = new createjs.Stage("mainGame");
 
-	var sun = new astroObject(stage, 'sun',"Yellow",null,null, 50);
-	var earth = new astroObject(stage, 'earth',"DeepSkyBlue", sun, 200, 25);
+	var sun = new astroObject(stage,'sun','yellow',null,null,50,null);
 
 	stage.addChild(sun.getCanvasDrawing());
-	stage.addChild(earth.getCanvasDrawing());
+
+	var astroObjectConstructor = [
+		['earth','DeepSkyBlue', sun, 200, 15],
+		['mars','red', sun, 300, 20],
+		['Jupiter','orange', sun, 350, 20],
+		['Saturn','pink', sun, 370, 20],
+		['Uranus','darkblue', sun, 380, 20]
+
+	];
+
+	var astroObjectArray = [ [1,1] ];
+
+	astroObjectConstructor.forEach(function(element, index) {
+		var newAstroObject = new astroObject(stage, element[0],element[1],element[2],element[3],element[4]);
+		astroObjectArray[index] = [ element[0], newAstroObject];
+		console.log(astroObjectArray[index][1].getCanvasDrawing());
+		stage.addChild(astroObjectArray[index][1].getCanvasDrawing());
+	});
+
 	stage.update();
 
 	createjs.Ticker.addEventListener("tick", tick);
 	function tick() {
-		earth.updatePosition();
-		stage.update();
 	}
 
 }
